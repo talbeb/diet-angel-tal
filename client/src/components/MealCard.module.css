@@ -1,0 +1,48 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  width: 100%;
+  font-size: 14px;
+}
+
+.card:hover {
+  border-color: #ccc;
+  background: #f0f0f0;
+}
+
+.card:active {
+  transform: scale(0.97);
+}
+
+.selected {
+  border-color: #4caf50;
+  background: #f0faf0;
+}
+
+.emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.label {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.stars {
+  font-size: 13px;
+  display: flex;
+  gap: 4px;
+}
+
+.noStars {
+  color: #aaa;
+}
