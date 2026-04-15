@@ -1,0 +1,72 @@
+.list {
+  list-style: none;
+  padding: 8px 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.time {
+  font-size: 13px;
+  color: #888;
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.emoji {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.name {
+  font-weight: 500;
+  flex: 1;
+}
+
+.stars {
+  font-size: 14px;
+  display: flex;
+  gap: 4px;
+}
+
+.delete {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.delete:hover {
+  color: #e57373;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: #aaa;
+}
+
+.angel {
+  font-size: 48px;
+}
+
+.empty p {
+  font-size: 15px;
+}

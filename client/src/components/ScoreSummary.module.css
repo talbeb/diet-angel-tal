@@ -1,0 +1,29 @@
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fffbe6;
+  border-bottom: 1px solid #f0e8c0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.stars {
+  font-size: 18px;
+  display: flex;
+  gap: 6px;
+}
+
+.empty {
+  font-size: 13px;
+  color: #bbb;
+  font-style: italic;
+}
