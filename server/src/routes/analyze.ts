@@ -99,11 +99,36 @@ Notes:
 // ---------------------------------------------------------------------------
 // POST /api/analyze-image
 // ---------------------------------------------------------------------------
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
+
+const VALID_MACROS = new Set(['carb', 'fat', 'protein', 'free']);
+
+function validateIngredients(items: unknown[]): items is Array<{ name: string; amount: string; kcal: number; dominant_macro: string }> {
+  return items.every(
+    (item) =>
+      item !== null &&
+      typeof item === 'object' &&
+      typeof (item as Record<string, unknown>).name === 'string' &&
+      typeof (item as Record<string, unknown>).amount === 'string' &&
+      typeof (item as Record<string, unknown>).kcal === 'number' &&
+      VALID_MACROS.has((item as Record<string, unknown>).dominant_macro as string),
+  );
+}
+
 router.post(
   '/analyze-image',
-  (req: Request, _res: Response, next) => {
+  (req: Request, res: Response, next) => {
     const chunks: Buffer[] = [];
-    req.on('data', (c: Buffer) => chunks.push(c));
+    let totalSize = 0;
+    req.on('data', (c: Buffer) => {
+      totalSize += c.length;
+      if (totalSize > MAX_UPLOAD_BYTES) {
+        res.status(413).json({ error: 'Image too large. Max 5 MB.' });
+        req.destroy();
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => {
       (req as Request & { rawBody: Buffer }).rawBody = Buffer.concat(chunks);
       next();
@@ -154,6 +179,11 @@ router.post(
           return;
         }
         ingredients = JSON.parse(match[0]);
+      }
+
+      if (!Array.isArray(ingredients) || !validateIngredients(ingredients)) {
+        res.status(500).json({ error: 'AI returned unexpected ingredient format.' });
+        return;
       }
 
       res.json({ ingredients });
