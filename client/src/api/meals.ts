@@ -1,4 +1,4 @@
-import { Meal, MealDefinitions, MealType } from '../types';
+import { Meal, MealDefinitions, MealType, Settings, WeightEntry } from '../types';
 
 const BASE = '/api';
 
@@ -27,4 +27,41 @@ export async function addMeal(date: string, meal: MealType, time: string): Promi
 export async function deleteMeal(id: string): Promise<void> {
   const res = await fetch(`${BASE}/meals/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Failed to delete meal');
+}
+
+export async function fetchSettings(): Promise<Settings> {
+  const res = await fetch(`${BASE}/settings`);
+  if (!res.ok) throw new Error('Failed to fetch settings');
+  return res.json();
+}
+
+export async function saveSettings(settings: Omit<Settings, '_id'>): Promise<Settings> {
+  const res = await fetch(`${BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
+  });
+  if (!res.ok) throw new Error('Failed to save settings');
+  return res.json();
+}
+
+export async function fetchWeightEntries(): Promise<WeightEntry[]> {
+  const res = await fetch(`${BASE}/weight`);
+  if (!res.ok) throw new Error('Failed to fetch weight entries');
+  return res.json();
+}
+
+export async function addWeightEntry(date: string, weight: number): Promise<WeightEntry> {
+  const res = await fetch(`${BASE}/weight`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ date, weight }),
+  });
+  if (!res.ok) throw new Error('Failed to add weight entry');
+  return res.json();
+}
+
+export async function deleteWeightEntry(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/weight/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete weight entry');
 }

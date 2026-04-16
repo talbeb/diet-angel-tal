@@ -1,0 +1,190 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 70px;
+}
+
+.header {
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  overflow-x: auto;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.green {
+  background: #f0faf0;
+  border: 1.5px solid #a5d6a7;
+}
+
+.green .statValue {
+  color: #2e7d32;
+}
+
+.red {
+  background: #fff5f5;
+  border: 1.5px solid #ef9a9a;
+}
+
+.red .statValue {
+  color: #c62828;
+}
+
+/* Chart */
+.chart {
+  padding: 8px 8px 0;
+}
+
+/* Add entry */
+.addSection {
+  padding: 20px 20px 8px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+}
+
+.addTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fafafa;
+  color: #1a1a1a;
+  min-width: 0;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.addBtn {
+  padding: 10px 18px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: #43a047;
+}
+
+.addBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Entry list */
+.list {
+  list-style: none;
+  padding: 0 0 8px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.entryDate {
+  font-size: 14px;
+  color: #888;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.entryWeight {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.deleteBtn:hover {
+  color: #e57373;
+}
+
+.msg {
+  color: #aaa;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.errorMsg {
+  color: #e53935;
+  padding: 16px 20px;
+  font-size: 14px;
+}

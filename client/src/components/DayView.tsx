@@ -1,13 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Meal, MealDefinitions, MealType, DayScore } from '../types';
-import { fetchMealsForDate, fetchMealDefinitions, addMeal, deleteMeal } from '../api/meals';
+import { Meal, MealDefinitions, MealType, DayScore, Settings } from '../types';
+import { fetchMealsForDate, fetchMealDefinitions, addMeal, deleteMeal, fetchSettings, saveSettings } from '../api/meals';
 import ScoreSummary from './ScoreSummary';
 import MealList from './MealList';
 import AddMealSheet from './AddMealSheet';
+import SettingsSheet from './SettingsSheet';
 import styles from './DayView.module.css';
 
 function toDateString(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function formatDisplayDate(dateStr: string): string {
@@ -38,15 +42,20 @@ export default function DayView() {
   const [date, setDate] = useState(toDateString(new Date()));
   const [meals, setMeals] = useState<Meal[]>([]);
   const [definitions, setDefinitions] = useState<MealDefinitions | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load definitions once
+  // Load definitions and settings once
   useEffect(() => {
     fetchMealDefinitions()
       .then(setDefinitions)
       .catch(() => setError('Could not load meal definitions.'));
+    fetchSettings()
+      .then(setSettings)
+      .catch(() => setError('Could not load settings.'));
   }, []);
 
   // Load meals whenever date changes
@@ -81,6 +90,11 @@ export default function DayView() {
     setMeals((prev) => prev.filter((m) => m._id !== id));
   }
 
+  async function handleSaveSettings(s: Omit<Settings, '_id'>) {
+    const updated = await saveSettings(s);
+    setSettings(updated);
+  }
+
   const isToday = date === toDateString(new Date());
   const defaultTime = isToday ? currentTime() : '12:00';
   const score = computeScore(meals);
@@ -99,10 +113,18 @@ export default function DayView() {
         >
           ›
         </button>
+        <button
+          className={styles.settingsBtn}
+          onClick={() => setSettingsOpen(true)}
+          type="button"
+          aria-label="Settings"
+        >
+          ⚙️
+        </button>
       </header>
 
       {/* Score */}
-      <ScoreSummary score={score} />
+      <ScoreSummary score={score} settings={settings} />
 
       {/* Meals */}
       {error && <p className={styles.error}>{error}</p>}
@@ -117,13 +139,22 @@ export default function DayView() {
         +
       </button>
 
-      {/* Bottom sheet */}
+      {/* Add meal sheet */}
       {sheetOpen && definitions && (
         <AddMealSheet
           definitions={definitions}
           defaultTime={defaultTime}
           onAdd={handleAddMeal}
           onClose={() => setSheetOpen(false)}
+        />
+      )}
+
+      {/* Settings sheet */}
+      {settingsOpen && settings && (
+        <SettingsSheet
+          settings={settings}
+          onSave={handleSaveSettings}
+          onClose={() => setSettingsOpen(false)}
         />
       )}
     </div>
