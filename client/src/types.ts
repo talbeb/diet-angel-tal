@@ -1,4 +1,17 @@
-export type MealType = 'pizza' | 'salad' | 'egg';
+export type MealType = 'pizza' | 'salad' | 'egg' | 'analyzed';
+
+export interface RawIngredient {
+  name: string;
+  amount: string;
+  kcal: number;
+  dominant_macro: 'carb' | 'fat' | 'protein' | 'free';
+}
+
+export interface IngredientResult extends RawIngredient {
+  userKcal: number;   // user-adjusted kcal (starts equal to kcal)
+  stars: number;
+  color: 'red' | 'yellow' | 'free';
+}
 
 export interface MealDefinition {
   label: string;

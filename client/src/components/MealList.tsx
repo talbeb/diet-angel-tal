@@ -21,11 +21,13 @@ export default function MealList({ meals, definitions, onDelete }: Props) {
     <ul className={styles.list}>
       {meals.map((m) => {
         const def = definitions[m.meal];
+        const emoji = def?.emoji ?? '📷';
+        const label = m.meal === 'analyzed' ? (m.free || 'ניתוח תמונה') : (def?.label ?? m.meal);
         return (
           <li key={m._id} className={styles.item}>
             <span className={styles.time}>{m.time}</span>
-            <span className={styles.emoji}>{def.emoji}</span>
-            <span className={styles.name}>{def.label}</span>
+            <span className={styles.emoji}>{emoji}</span>
+            <span className={styles.name}>{label}</span>
             <span className={styles.stars}>
               {m.yellowStars > 0 && <span>{'⭐'.repeat(m.yellowStars)}</span>}
               {m.redStars > 0 && <span>{'🔴'.repeat(m.redStars)}</span>}
