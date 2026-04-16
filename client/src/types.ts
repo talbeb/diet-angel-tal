@@ -25,3 +25,17 @@ export interface DayScore {
 }
 
 export type MealDefinitions = Record<MealType, MealDefinition>;
+
+export interface Settings {
+  _id: string;
+  weightGoal: number | null;
+  maxYellowStars: number | null;
+  maxRedStars: number | null;
+}
+
+export interface WeightEntry {
+  _id: string;
+  date: string;    // YYYY-MM-DD
+  weight: number;
+  createdAt: string;
+}

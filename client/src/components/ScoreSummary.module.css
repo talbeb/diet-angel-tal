@@ -2,9 +2,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: #fffbe6;
   border-bottom: 1px solid #f0e8c0;
+  flex-wrap: wrap;
 }
 
 .label {
@@ -16,10 +17,38 @@
   white-space: nowrap;
 }
 
-.stars {
-  font-size: 18px;
+.scores {
   display: flex;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+
+.limit {
+  font-size: 12px;
+  font-weight: 400;
+  color: #aaa;
+}
+
+.over {
+  border-color: #e53935;
+  background: #fff5f5;
+  color: #e53935;
+}
+
+.over .limit {
+  color: #e5393599;
 }
 
 .empty {

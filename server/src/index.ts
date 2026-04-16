@@ -3,6 +3,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import mealsRouter from './routes/meals';
+import settingsRouter from './routes/settings';
+import weightRouter from './routes/weight';
 
 dotenv.config();
 
@@ -13,6 +15,8 @@ const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/diet-angel
 app.use(cors());
 app.use(express.json());
 app.use('/api', mealsRouter);
+app.use('/api', settingsRouter);
+app.use('/api', weightRouter);
 
 mongoose
   .connect(MONGO_URI)
