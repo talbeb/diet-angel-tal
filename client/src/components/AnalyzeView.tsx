@@ -15,17 +15,22 @@ function currentTime(): string {
   return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 }
 
+const KCAL_PER_STAR = 100;
+const MAX_STARS_DISPLAY = 10;
+
+function calcIngredient<T extends { dominant_macro: string }>(base: T, userKcal: number): T & { userKcal: number; stars: number; color: 'red' | 'yellow' | 'free' } {
+  const isFree = base.dominant_macro === 'free';
+  const stars = isFree ? 0 : Math.min(Math.round(userKcal / KCAL_PER_STAR), MAX_STARS_DISPLAY);
+  const color: 'red' | 'yellow' | 'free' = isFree ? 'free' : base.dominant_macro === 'carb' ? 'red' : 'yellow';
+  return { ...base, userKcal, stars, color };
+}
+
 function toIngredientResult(raw: RawIngredient): IngredientResult {
-  const userKcal = raw.kcal;
-  const stars = raw.dominant_macro === 'free' ? 0 : Math.round(userKcal / 100);
-  const color = raw.dominant_macro === 'free' ? 'free' : raw.dominant_macro === 'carb' ? 'red' : 'yellow';
-  return { ...raw, userKcal, stars, color };
+  return calcIngredient(raw, raw.kcal);
 }
 
 function recalc(item: IngredientResult, userKcal: number): IngredientResult {
-  const stars = item.dominant_macro === 'free' ? 0 : Math.round(userKcal / 100);
-  const color = item.dominant_macro === 'free' ? 'free' : item.dominant_macro === 'carb' ? 'red' : 'yellow';
-  return { ...item, userKcal, stars, color };
+  return calcIngredient(item, userKcal);
 }
 
 interface Props {
@@ -191,10 +196,10 @@ export default function AnalyzeView({ onMealAdded }: Props) {
           {/* Summary */}
           <div className={styles.summary}>
             {totalRedStars > 0 && (
-              <span className={styles.summaryItem}>{'🔴'.repeat(totalRedStars)} {totalRedStars} כוכבים אדומים</span>
+              <span className={styles.summaryItem}>{'🔴'.repeat(Math.min(totalRedStars, MAX_STARS_DISPLAY))} {totalRedStars} כוכבים אדומים</span>
             )}
             {totalYellowStars > 0 && (
-              <span className={styles.summaryItem}>{'⭐'.repeat(totalYellowStars)} {totalYellowStars} כוכבים צהובים</span>
+              <span className={styles.summaryItem}>{'⭐'.repeat(Math.min(totalYellowStars, MAX_STARS_DISPLAY))} {totalYellowStars} כוכבים צהובים</span>
             )}
             {totalRedStars === 0 && totalYellowStars === 0 && (
               <span className={styles.summaryItem}>✅ ארוחה חינמית!</span>
