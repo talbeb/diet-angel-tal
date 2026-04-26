@@ -1,0 +1,192 @@
+.container {
+  padding: 20px 16px 90px;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #f9f9f9;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+/* Progress card */
+.progressCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.progressCount {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.progressBar {
+  height: 10px;
+  background: #e8e8e8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #4caf50;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.goalReached {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4caf50;
+  text-align: center;
+}
+
+/* Training list */
+.trainingList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.trainingItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.trainingDate {
+  font-weight: 600;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.trainingTime {
+  color: #555;
+}
+
+.trainingDuration {
+  color: #888;
+  font-size: 12px;
+}
+
+.calIcon {
+  font-size: 14px;
+}
+
+.weekRange {
+  font-size: 12px;
+  color: #bbb;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Calendar section */
+.calendarSection {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.connectedBadge {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4caf50;
+}
+
+.hint {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
+}
+
+.primaryBtn {
+  padding: 13px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: #43a047;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.disconnectBtn {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  text-align: left;
+}
+
+.disconnectBtn:hover {
+  color: #e53935;
+}
+
+.error {
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #c62828;
+  margin-bottom: 12px;
+}
+
+/* Grid section */
+.gridSection {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}

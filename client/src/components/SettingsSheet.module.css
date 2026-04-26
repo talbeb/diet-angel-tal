@@ -73,6 +73,52 @@
   color: #bbb;
 }
 
+.sectionDivider {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4caf50;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+
+.fieldRow .field {
+  flex: 1;
+}
+
+.dayGrid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dayBtn {
+  padding: 6px 10px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dayBtn:hover {
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.dayBtnActive {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+}
+
 .actions {
   display: flex;
   gap: 10px;

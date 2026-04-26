@@ -1,0 +1,116 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.dayCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 42px;
+}
+
+.today .dayHeader {
+  background: #e8f5e9;
+  border-radius: 8px;
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px;
+  margin-bottom: 2px;
+}
+
+.dayName {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.dayNum {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.today .dayName,
+.today .dayNum {
+  color: #4caf50;
+}
+
+.suggestionSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  width: 100%;
+}
+
+.suggestionSlot:hover:not(:disabled) {
+  background: #c8e6c9;
+  transform: scale(1.03);
+}
+
+.suggestionSlot:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.confirming {
+  border-color: #aaa;
+  background: #f5f5f5;
+}
+
+.confirmedSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+}
+
+.slotTime {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.confirmedSlot .slotTime {
+  color: #888;
+}
+
+.slotEnd {
+  font-size: 10px;
+  color: #555;
+}
+
+.confirmBtn {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4caf50;
+  line-height: 1;
+}
+
+.checkmark {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.slotLoading {
+  font-size: 13px;
+  color: #aaa;
+}
