@@ -44,6 +44,28 @@ export interface Settings {
   weightGoal: number | null;
   maxYellowStars: number | null;
   maxRedStars: number | null;
+  trainingsPerWeek: number | null;
+  preferredDays: number[];
+  preferredTimeFrom: string | null;
+  preferredTimeTo: string | null;
+  sessionDurationMin: number | null;
+}
+
+export interface Training {
+  _id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  durationMin: number;
+  googleEventId: string | null;
+  createdAt: string;
+}
+
+export interface TrainingSuggestion {
+  date: string;
+  startTime: string;
+  endTime: string;
+  reason: string;
 }
 
 export interface WeightEntry {

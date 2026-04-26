@@ -7,6 +7,8 @@ import mealsRouter from './routes/meals';
 import settingsRouter from './routes/settings';
 import weightRouter from './routes/weight';
 import analyzeRouter from './routes/analyze';
+import calendarRouter from './routes/calendar';
+import trainingRouter from './routes/training';
 
 dotenv.config();
 
@@ -32,6 +34,8 @@ app.use('/api', mealsRouter);
 app.use('/api', settingsRouter);
 app.use('/api', weightRouter);
 app.use('/api', analyzeRouter);
+app.use('/api', calendarRouter);
+app.use('/api', trainingRouter);
 
 mongoose
   .connect(MONGO_URI)

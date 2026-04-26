@@ -1,6 +1,6 @@
 import styles from './BottomNav.module.css';
 
-export type Tab = 'daily' | 'weight' | 'analyze';
+export type Tab = 'daily' | 'weight' | 'analyze' | 'fitness';
 
 interface Props {
   active: Tab;
@@ -11,6 +11,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'daily',   label: 'Daily',   icon: '📅' },
   { id: 'analyze', label: 'ניתוח',   icon: '📷' },
   { id: 'weight',  label: 'Weight',  icon: '⚖️' },
+  { id: 'fitness', label: 'Fitness', icon: '🏋️' },
 ];
 
 export default function BottomNav({ active, onChange }: Props) {
