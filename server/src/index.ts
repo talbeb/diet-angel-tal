@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -57,6 +58,10 @@ app.use('/api', analyzeRouter);
 if (ENABLE_CALENDAR) app.use('/api', calendarRouter);
 app.use('/api', trainingRouter);
 
+// In production, serve the built client
+const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
+app.use(express.static(clientDist));
+
 // Test-only endpoint: reset all collections (only enabled for test DB)
 if (MONGO_URI.includes('-test')) {
   app.post('/api/test/reset', async (_req, res) => {
@@ -68,6 +73,11 @@ if (MONGO_URI.includes('-test')) {
   });
   console.log('Test reset endpoint enabled (/api/test/reset)');
 }
+
+// SPA fallback — serve index.html for any non-API route
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
 
 mongoose
   .connect(MONGO_URI)
