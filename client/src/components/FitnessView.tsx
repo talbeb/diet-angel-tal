@@ -11,6 +11,9 @@ import { fetchSettings } from '../api/meals';
 import TrainingWeekGrid from './TrainingWeekGrid';
 import styles from './FitnessView.module.css';
 
+// Feature flag — flip to true when Google Calendar integration is ready for users
+const ENABLE_CALENDAR = false;
+
 export default function FitnessView() {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -43,10 +46,27 @@ export default function FitnessView() {
     fetchSettings()
       .then((s) => { if (s.trainingsPerWeek) setTrainingsPerWeekTarget(s.trainingsPerWeek); })
       .catch(() => {});
-    getCalendarStatus()
-      .then((s) => setCalendarConnected(s.connected))
-      .catch(() => {})
-      .finally(() => setLoadingStatus(false));
+
+    if (ENABLE_CALENDAR) {
+      // Handle OAuth redirect params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('calendarConnected') === 'true') {
+        setCalendarConnected(true);
+        setLoadingStatus(false);
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (params.get('calendarError')) {
+        setError('Calendar connection was denied or failed.');
+        setLoadingStatus(false);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      getCalendarStatus()
+        .then((s) => setCalendarConnected(s.connected))
+        .catch(() => {})
+        .finally(() => setLoadingStatus(false));
+    } else {
+      setLoadingStatus(false);
+    }
   }, [loadWeek]);
 
   async function handleConnect() {
@@ -54,18 +74,12 @@ export default function FitnessView() {
     setError('');
     try {
       const { url } = await getCalendarAuthUrl();
-      window.open(url, '_blank');
-      // After the user authorizes, the MCP flow completes via Anthropic's callback.
-      // For now, show a prompt to paste the token they receive back.
-      const token = window.prompt('Paste the authorization token from Google Calendar:');
-      if (token) {
-        const { connectCalendar } = await import('../api/calendar');
-        await connectCalendar(token);
-        setCalendarConnected(true);
-      }
+      // Redirect to Google OAuth consent page.
+      // After authorization, Google redirects to the server callback,
+      // which then redirects back here with ?calendarConnected=true
+      window.location.href = url;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to connect calendar.');
-    } finally {
       setLoadingAuth(false);
     }
   }
@@ -149,35 +163,37 @@ export default function FitnessView() {
         <p className={styles.weekRange}>Week: {weekStart} – {weekEnd}</p>
       )}
 
-      {/* Calendar section */}
-      <div className={styles.calendarSection}>
-        <h2 className={styles.sectionTitle}>Google Calendar</h2>
+      {/* Calendar section — behind feature flag */}
+      {ENABLE_CALENDAR && (
+        <div className={styles.calendarSection}>
+          <h2 className={styles.sectionTitle}>Google Calendar</h2>
 
-        {loadingStatus ? (
-          <p className={styles.hint}>Checking connection…</p>
-        ) : calendarConnected ? (
-          <>
-            <div className={styles.connectedBadge}>✓ Connected</div>
-            <button
-              className={styles.primaryBtn}
-              onClick={handleFindSlots}
-              disabled={loadingSuggestions}
-            >
-              {loadingSuggestions ? 'Analyzing your calendar…' : 'Find training slots'}
-            </button>
-            <button className={styles.disconnectBtn} onClick={handleDisconnect}>
-              Disconnect
-            </button>
-          </>
-        ) : (
-          <>
-            <p className={styles.hint}>Connect Google Calendar to get AI-powered training slot suggestions.</p>
-            <button className={styles.primaryBtn} onClick={handleConnect} disabled={loadingAuth}>
-              {loadingAuth ? 'Opening…' : 'Connect Google Calendar'}
-            </button>
-          </>
-        )}
-      </div>
+          {loadingStatus ? (
+            <p className={styles.hint}>Checking connection…</p>
+          ) : calendarConnected ? (
+            <>
+              <div className={styles.connectedBadge}>✓ Connected</div>
+              <button
+                className={styles.primaryBtn}
+                onClick={handleFindSlots}
+                disabled={loadingSuggestions}
+              >
+                {loadingSuggestions ? 'Analyzing your calendar…' : 'Find training slots'}
+              </button>
+              <button className={styles.disconnectBtn} onClick={handleDisconnect}>
+                Disconnect
+              </button>
+            </>
+          ) : (
+            <>
+              <p className={styles.hint}>Connect Google Calendar to get AI-powered training slot suggestions.</p>
+              <button className={styles.primaryBtn} onClick={handleConnect} disabled={loadingAuth}>
+                {loadingAuth ? 'Opening…' : 'Connect Google Calendar'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {error && <p className={styles.error}>{error}</p>}
 

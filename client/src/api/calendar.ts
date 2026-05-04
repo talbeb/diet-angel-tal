@@ -14,15 +14,6 @@ export async function getCalendarAuthUrl(): Promise<{ url: string }> {
   return res.json();
 }
 
-export async function connectCalendar(token: string): Promise<void> {
-  const res = await fetch(`${BASE}/calendar/connect`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
-  });
-  if (!res.ok) throw new Error('Failed to connect calendar');
-}
-
 export async function disconnectCalendar(): Promise<void> {
   await fetch(`${BASE}/calendar/disconnect`, { method: 'POST' });
 }

@@ -8,7 +8,7 @@ function stripToken(doc: unknown) {
   const obj = typeof (doc as any).toObject === 'function'
     ? (doc as any).toObject()
     : { ...(doc as object) };
-  delete (obj as any).googleCalendarMcpToken;
+  delete (obj as any).googleCalendarRefreshToken;
   return obj;
 }
 

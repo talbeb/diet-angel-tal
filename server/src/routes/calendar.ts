@@ -1,144 +1,97 @@
 import { Router, Request, Response } from 'express';
-import Anthropic from '@anthropic-ai/sdk';
 import Settings from '../models/Settings';
+import {
+  getAuthUrl,
+  exchangeCode,
+  fetchEvents,
+  findFreeSlots,
+} from '../services/googleCalendar';
 
 const router = Router();
 
-// Direct Anthropic client (bypasses Wix proxy) for MCP-enabled calls
-let _directClient: Anthropic | null = null;
-function getDirectClient(): Anthropic {
-  if (!_directClient) {
-    _directClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _directClient;
-}
-
-const MCP_SERVER_URL = 'https://mcp.anthropic.com/google-calendar';
-const MODEL = 'claude-opus-4-6';
-
-// Run a Claude agentic loop with Google Calendar MCP tools until Claude stops calling tools.
-// Returns the final text response.
-async function runCalendarAgentLoop(
-  messages: Anthropic.MessageParam[],
-  authToken: string | null,
-  allowedTools: string[],
-): Promise<{ text: string; toolResults: Record<string, unknown> }> {
-  const mcpServer: Record<string, unknown> = { type: 'url', url: MCP_SERVER_URL };
-  if (authToken) mcpServer.authorization_token = authToken;
-
-  const allMessages = [...messages];
-  const toolResults: Record<string, unknown> = {};
-
-  for (let i = 0; i < 10; i++) {
-    const response = await (getDirectClient().beta.messages as any).create({
-      model: MODEL,
-      max_tokens: 4096,
-      betas: ['mcp-client-2025-04-04'],
-      mcp_servers: [mcpServer],
-      allowed_tools: allowedTools.map((name) => ({ type: 'mcp', server_name: 'google-calendar', name })),
-      messages: allMessages,
-    });
-
-    allMessages.push({ role: 'assistant', content: response.content });
-
-    if (response.stop_reason !== 'tool_use') {
-      const text = response.content
-        .filter((b: { type: string }) => b.type === 'text')
-        .map((b: { type: string; text: string }) => b.text)
-        .join('');
-      return { text, toolResults };
-    }
-
-    // Process tool results
-    const toolUseBlocks = response.content.filter((b: { type: string }) => b.type === 'tool_use');
-    const toolResultContents: Anthropic.ToolResultBlockParam[] = [];
-
-    for (const block of toolUseBlocks as Array<{ id: string; name: string; input: unknown }>) {
-      // Capture tool results (e.g. auth URLs)
-      toolResults[block.name] = block.input;
-      toolResultContents.push({
-        type: 'tool_result',
-        tool_use_id: block.id,
-        content: 'Tool executed successfully.',
-      });
-    }
-
-    allMessages.push({ role: 'user', content: toolResultContents });
-  }
-
-  return { text: '', toolResults };
-}
+const CLIENT_URL = process.env.CLIENT_URL ?? 'http://localhost:5173';
 
 // ---------------------------------------------------------------------------
 // GET /api/calendar/status
 // ---------------------------------------------------------------------------
 router.get('/calendar/status', async (_req: Request, res: Response) => {
   const settings = await Settings.findOne();
-  res.json({ connected: !!(settings?.googleCalendarMcpToken) });
+  res.json({ connected: !!(settings?.googleCalendarRefreshToken) });
 });
 
 // ---------------------------------------------------------------------------
 // GET /api/calendar/auth-url
-// Initiates OAuth: Claude calls authenticate tool, returns the URL to the client.
+// Returns the Google OAuth2 consent URL.
 // ---------------------------------------------------------------------------
 router.get('/calendar/auth-url', async (_req: Request, res: Response) => {
   try {
-    const { toolResults } = await runCalendarAgentLoop(
-      [{ role: 'user', content: 'Please authenticate with Google Calendar so I can access my calendar.' }],
-      null,
-      ['authenticate'],
-    );
-
-    // The authenticate tool result contains an auth URL
-    const authResult = toolResults['authenticate'] as Record<string, unknown> | undefined;
-    const authUrl = authResult?.url ?? authResult?.auth_url ?? authResult?.authorization_url;
-
-    if (!authUrl) {
-      res.status(500).json({ error: 'Could not retrieve authentication URL from MCP.' });
-      return;
-    }
-
-    res.json({ url: authUrl });
+    const url = getAuthUrl();
+    res.json({ url });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('Calendar auth-url error:', msg);
-    res.status(500).json({ error: 'Failed to initiate calendar authentication.', detail: msg });
+    res.status(500).json({ error: 'Failed to generate auth URL.', detail: msg });
   }
 });
 
 // ---------------------------------------------------------------------------
-// POST /api/calendar/connect
-// Called after user completes OAuth. Stores the resulting token.
-// Body: { token: string }
+// GET /api/calendar/oauth-callback
+// Google redirects here after user authorizes. Exchanges code for tokens,
+// stores refresh token, then redirects back to the client.
 // ---------------------------------------------------------------------------
-router.post('/calendar/connect', async (req: Request, res: Response) => {
-  const { token } = req.body as { token?: string };
+router.get('/calendar/oauth-callback', async (req: Request, res: Response) => {
+  const code = req.query.code as string | undefined;
+  const error = req.query.error as string | undefined;
 
-  if (!token) {
-    res.status(400).json({ error: 'token is required.' });
+  if (error) {
+    res.redirect(`${CLIENT_URL}/fitness?calendarError=${encodeURIComponent(error)}`);
     return;
   }
 
-  await Settings.findOneAndUpdate({}, { googleCalendarMcpToken: token }, { upsert: true });
-  res.json({ connected: true });
+  if (!code) {
+    res.redirect(`${CLIENT_URL}/fitness?calendarError=no_code`);
+    return;
+  }
+
+  try {
+    const tokens = await exchangeCode(code);
+
+    if (!tokens.refresh_token) {
+      console.warn('No refresh token returned — user may have already authorized before.');
+    }
+
+    await Settings.findOneAndUpdate(
+      {},
+      {
+        googleCalendarRefreshToken: tokens.refresh_token ?? null,
+      },
+      { upsert: true },
+    );
+
+    res.redirect(`${CLIENT_URL}/fitness?calendarConnected=true`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('OAuth callback error:', msg);
+    res.redirect(`${CLIENT_URL}/fitness?calendarError=${encodeURIComponent('Token exchange failed')}`);
+  }
 });
 
 // ---------------------------------------------------------------------------
 // POST /api/calendar/disconnect
 // ---------------------------------------------------------------------------
 router.post('/calendar/disconnect', async (_req: Request, res: Response) => {
-  await Settings.findOneAndUpdate({}, { googleCalendarMcpToken: null });
+  await Settings.findOneAndUpdate({}, { googleCalendarRefreshToken: null });
   res.json({ connected: false });
 });
 
 // ---------------------------------------------------------------------------
 // GET /api/calendar/suggestions
-// Uses Claude + Google Calendar MCP to fetch free/busy and suggest training slots.
+// Fetches calendar events and algorithmically finds free training slots.
 // ---------------------------------------------------------------------------
 router.get('/calendar/suggestions', async (_req: Request, res: Response) => {
   const settings = await Settings.findOne();
 
-  if (!settings?.googleCalendarMcpToken) {
+  if (!settings?.googleCalendarRefreshToken) {
     res.status(401).json({ error: 'Google Calendar not connected.' });
     return;
   }
@@ -149,9 +102,10 @@ router.get('/calendar/suggestions', async (_req: Request, res: Response) => {
     preferredTimeFrom,
     preferredTimeTo,
     sessionDurationMin,
-    googleCalendarMcpToken,
+    googleCalendarRefreshToken,
   } = settings;
 
+  // Check how many trainings are already confirmed this week
   const Training = (await import('../models/Training')).default;
   const today = new Date();
   const weekStart = new Date(today);
@@ -169,41 +123,20 @@ router.get('/calendar/suggestions', async (_req: Request, res: Response) => {
     return;
   }
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const preferredDayNames = (preferredDays ?? []).map((d: number) => dayNames[d]).join(', ') || 'any day';
-
-  const prompt = `I want to schedule ${remaining} training session(s) this week.
-My preferences:
-- Preferred days: ${preferredDayNames}
-- Preferred time window: ${preferredTimeFrom ?? '07:00'} – ${preferredTimeTo ?? '21:00'}
-- Session duration: ${sessionDurationMin ?? 60} minutes
-
-Please:
-1. Fetch my calendar events for the next 7 days to see what times are busy.
-2. Identify free time slots that fit my preferences and have enough time for a ${sessionDurationMin ?? 60}-minute session.
-3. Return ONLY a valid JSON array (no markdown, no explanation) with up to ${remaining} best suggestions:
-[{"date":"YYYY-MM-DD","startTime":"HH:mm","endTime":"HH:mm","reason":"brief reason"}]
-
-Important: Only pass busy/free time information from the calendar. Do not include event titles or descriptions in your reasoning.`;
-
   try {
-    const { text } = await runCalendarAgentLoop(
-      [{ role: 'user', content: prompt }],
-      googleCalendarMcpToken,
-      ['list_events', 'list_calendars'],
-    );
+    const now = new Date();
+    const weekAhead = new Date(now.getTime() + 7 * 86400000);
 
-    let suggestions: unknown[];
-    try {
-      suggestions = JSON.parse(text);
-    } catch {
-      const match = text.match(/\[[\s\S]*\]/);
-      if (!match) {
-        res.status(500).json({ error: 'Failed to parse suggestions from AI.', raw: text });
-        return;
-      }
-      suggestions = JSON.parse(match[0]);
-    }
+    const busySlots = await fetchEvents(googleCalendarRefreshToken, now, weekAhead);
+
+    const suggestions = findFreeSlots(
+      busySlots,
+      preferredDays ?? [],
+      preferredTimeFrom ?? '07:00',
+      preferredTimeTo ?? '21:00',
+      sessionDurationMin ?? 60,
+      remaining,
+    );
 
     res.json({ suggestions });
   } catch (err: unknown) {

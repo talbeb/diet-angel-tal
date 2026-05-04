@@ -10,7 +10,7 @@ export interface ISettings extends Document {
   preferredTimeTo: string | null;
   sessionDurationMin: number | null;
   // server-side only — never sent to client
-  googleCalendarMcpToken: string | null;
+  googleCalendarRefreshToken: string | null;
 }
 
 const SettingsSchema = new Schema<ISettings>({
@@ -22,7 +22,7 @@ const SettingsSchema = new Schema<ISettings>({
   preferredTimeFrom:    { type: String, default: null },
   preferredTimeTo:      { type: String, default: null },
   sessionDurationMin:   { type: Number, default: null },
-  googleCalendarMcpToken: { type: String, default: null },
+  googleCalendarRefreshToken: { type: String, default: null },
 });
 
 export default mongoose.model<ISettings>('Settings', SettingsSchema);

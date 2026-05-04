@@ -49,40 +49,21 @@ router.post('/training', async (req: Request, res: Response) => {
 
   let googleEventId: string | null = null;
 
-  // Attempt to create a Google Calendar event via MCP
+  // Attempt to create a Google Calendar event via direct API
   try {
     const Settings = (await import('../models/Settings')).default;
     const settings = await Settings.findOne();
-    if (settings?.googleCalendarMcpToken) {
-      const Anthropic = (await import('@anthropic-ai/sdk')).default;
-      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
+    if (settings?.googleCalendarRefreshToken) {
+      const { createEvent } = await import('../services/googleCalendar');
       const startISO = `${date}T${startTime}:00`;
       const endISO = `${date}T${endTime}:00`;
-
-      const response = await (client.beta.messages as any).create({
-        model: 'claude-opus-4-6',
-        max_tokens: 1024,
-        betas: ['mcp-client-2025-04-04'],
-        mcp_servers: [{
-          type: 'url',
-          url: 'https://mcp.anthropic.com/google-calendar',
-          authorization_token: settings.googleCalendarMcpToken,
-        }],
-        allowed_tools: [{ type: 'mcp', server_name: 'google-calendar', name: 'create_event' }],
-        messages: [{
-          role: 'user',
-          content: `Create a calendar event titled "🏋️ Training" from ${startISO} to ${endISO}. Return the event ID in your response.`,
-        }],
-      });
-
-      const text = response.content
-        .filter((b: { type: string }) => b.type === 'text')
-        .map((b: { type: string; text: string }) => b.text)
-        .join('');
-
-      const idMatch = text.match(/event[_\s]?id[:\s]+([a-zA-Z0-9_-]+)/i);
-      if (idMatch) googleEventId = idMatch[1];
+      const result = await createEvent(
+        settings.googleCalendarRefreshToken,
+        '\u{1F3CB}\u{FE0F} Training',
+        startISO,
+        endISO,
+      );
+      googleEventId = result.eventId;
     }
   } catch (err) {
     console.warn('Google Calendar event creation failed (training saved anyway):', err instanceof Error ? err.message : err);

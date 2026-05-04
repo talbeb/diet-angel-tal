@@ -24,6 +24,26 @@ if (!process.env.ANTHROPIC_API_KEY) {
   }
 }
 
+// Feature flag — flip to true when Google Calendar integration is ready
+const ENABLE_CALENDAR = false;
+
+// Load Google OAuth credentials from Keychain if not in env
+if (ENABLE_CALENDAR) {
+  for (const key of ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] as const) {
+    if (!process.env[key]) {
+      try {
+        process.env[key] = execSync(
+          `security find-generic-password -a "$USER" -s ${key} -w`,
+          { shell: '/bin/zsh', stdio: ['pipe', 'pipe', 'pipe'] }
+        ).toString().trim();
+        console.log(`${key} loaded from macOS Keychain`);
+      } catch {
+        console.warn(`Warning: ${key} not set and not found in Keychain`);
+      }
+    }
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/diet-angel-tal';
@@ -34,7 +54,7 @@ app.use('/api', mealsRouter);
 app.use('/api', settingsRouter);
 app.use('/api', weightRouter);
 app.use('/api', analyzeRouter);
-app.use('/api', calendarRouter);
+if (ENABLE_CALENDAR) app.use('/api', calendarRouter);
 app.use('/api', trainingRouter);
 
 mongoose
