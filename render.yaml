@@ -3,9 +3,12 @@ services:
     name: diet-angel-tal
     runtime: node
     plan: free
-    buildCommand: cd client && npm ci --include=dev && npm run build && cd ../server && npm ci --include=dev && npm run build
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install && npm run build
     startCommand: cd server && node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: development
       - key: MONGO_URI
-        sync: false # set manually in Render dashboard
+        sync: false
       - key: ANTHROPIC_API_KEY
-        sync: false # set manually in Render dashboard
+        sync: false
