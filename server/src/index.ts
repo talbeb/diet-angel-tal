@@ -57,6 +57,18 @@ app.use('/api', analyzeRouter);
 if (ENABLE_CALENDAR) app.use('/api', calendarRouter);
 app.use('/api', trainingRouter);
 
+// Test-only endpoint: reset all collections (only enabled for test DB)
+if (MONGO_URI.includes('-test')) {
+  app.post('/api/test/reset', async (_req, res) => {
+    const collections = await mongoose.connection.db!.listCollections().toArray();
+    for (const col of collections) {
+      await mongoose.connection.db!.collection(col.name).deleteMany({});
+    }
+    res.json({ ok: true });
+  });
+  console.log('Test reset endpoint enabled (/api/test/reset)');
+}
+
 mongoose
   .connect(MONGO_URI)
   .then(() => {
