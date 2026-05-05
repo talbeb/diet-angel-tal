@@ -87,6 +87,28 @@ export async function seedTraining(training: {
   });
 }
 
+export interface CatalogItemSeed {
+  mealName: string;
+  amount: string;
+  numberOfYellowStars: number;
+  numberOfRedStars: number;
+  free: boolean;
+  category: string;
+}
+
+/**
+ * Seeds meal catalog items for tests.
+ * The catalog is wiped on every resetTestDb() call, so tests that open
+ * the catalog sheet must seed items explicitly.
+ */
+export async function seedCatalogItems(items: CatalogItemSeed[]) {
+  await apiFetch(`${API_BASE}/test/seed-catalog`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(items),
+  });
+}
+
 /** Today's date as YYYY-MM-DD */
 export function todayStr(): string {
   return new Date().toISOString().slice(0, 10);

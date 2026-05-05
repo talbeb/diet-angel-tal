@@ -11,6 +11,7 @@ import analyzeRouter from './routes/analyze';
 import calendarRouter from './routes/calendar';
 import trainingRouter from './routes/training';
 import mealCatalogRouter from './routes/mealCatalog';
+import MealCatalogItem from './models/MealCatalogItem';
 
 dotenv.config();
 
@@ -73,6 +74,12 @@ if (MONGO_URI.includes('-test')) {
     }
     res.json({ ok: true });
   });
+
+  app.post('/api/test/seed-catalog', async (req, res) => {
+    await MealCatalogItem.insertMany(req.body);
+    res.json({ ok: true });
+  });
+
   console.log('Test reset endpoint enabled (/api/test/reset)');
 }
 

@@ -1,5 +1,15 @@
 export type MealType = 'pizza' | 'salad' | 'egg' | 'analyzed';
 
+export interface MealCatalogItem {
+  _id: string;
+  mealName: string;
+  amount: string;
+  numberOfYellowStars: number;
+  numberOfRedStars: number;
+  free: boolean;
+  category: string;
+}
+
 export interface RawIngredient {
   name: string;
   amount: string;
@@ -24,7 +34,8 @@ export interface MealDefinition {
 export interface Meal {
   _id: string;
   date: string;        // YYYY-MM-DD
-  meal: MealType;
+  meal: string;
+  amount: string;
   time: string;        // HH:mm
   yellowStars: number;
   redStars: number;

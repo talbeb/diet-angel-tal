@@ -22,14 +22,17 @@ router.get('/meals/:date', async (req: Request, res: Response) => {
 
 // POST /api/meals
 router.post('/meals', async (req: Request, res: Response) => {
-  const { date, meal, time } = req.body as { date: string; meal: MealType; time: string };
+  const { date, meal, time, amount, yellowStars: bodyYellow, redStars: bodyRed, free: bodyFree } = req.body as {
+    date: string; meal: string; time: string; amount?: string;
+    yellowStars?: number; redStars?: number; free?: string;
+  };
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD.' });
     return;
   }
-  if (!MEAL_TYPES.includes(meal)) {
-    res.status(400).json({ error: `Invalid meal. Must be one of: ${MEAL_TYPES.join(', ')}.` });
+  if (!meal || typeof meal !== 'string') {
+    res.status(400).json({ error: 'meal is required.' });
     return;
   }
   if (!/^\d{2}:\d{2}$/.test(time)) {
@@ -37,14 +40,13 @@ router.post('/meals', async (req: Request, res: Response) => {
     return;
   }
 
-  const def = MEAL_DEFINITIONS[meal];
+  const def = MEAL_DEFINITIONS[meal as MealType];
+  const yellowStars = def ? def.yellowStars : (typeof bodyYellow === 'number' ? bodyYellow : 0);
+  const redStars    = def ? def.redStars    : (typeof bodyRed   === 'number' ? bodyRed   : 0);
+  const free        = def ? def.free        : (bodyFree ?? '');
+
   const created = await Meal.create({
-    date,
-    meal,
-    time,
-    yellowStars: def.yellowStars,
-    redStars: def.redStars,
-    free: def.free,
+    date, meal, amount: amount ?? '', time, yellowStars, redStars, free,
   });
   res.status(201).json(created);
 });

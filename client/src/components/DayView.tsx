@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Meal, MealDefinitions, MealType, DayScore, Settings } from '../types';
+import { Meal, MealCatalogItem, MealDefinitions, DayScore, Settings } from '../types';
 import { fetchMealsForDate, fetchMealDefinitions, addMeal, deleteMeal, fetchSettings, saveSettings } from '../api/meals';
 import ScoreSummary from './ScoreSummary';
 import MealList from './MealList';
-import AddMealSheet from './AddMealSheet';
+import MealCatalogSheet from './MealCatalogSheet';
 import SettingsSheet from './SettingsSheet';
 import styles from './DayView.module.css';
 
@@ -80,8 +80,13 @@ export default function DayView() {
     setDate(toDateString(d));
   }
 
-  async function handleAddMeal(meal: MealType, time: string) {
-    const created = await addMeal(date, meal, time);
+  async function handleAddMeal(item: MealCatalogItem, time: string) {
+    const created = await addMeal(date, item.mealName, time, {
+      yellowStars: item.numberOfYellowStars,
+      redStars: item.numberOfRedStars,
+      free: '',
+      amount: item.amount,
+    });
     setMeals((prev) => [...prev, created].sort((a, b) => a.time.localeCompare(b.time)));
   }
 
@@ -149,9 +154,8 @@ export default function DayView() {
       </button>
 
       {/* Add meal sheet */}
-      {sheetOpen && definitions && (
-        <AddMealSheet
-          definitions={definitions}
+      {sheetOpen && (
+        <MealCatalogSheet
           defaultTime={defaultTime}
           onAdd={handleAddMeal}
           onClose={() => setSheetOpen(false)}

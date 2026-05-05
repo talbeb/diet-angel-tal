@@ -1,9 +1,14 @@
 import { test, expect, type Locator } from '@playwright/test';
-import { resetTestDb, seedSettings, seedMeal, todayStr } from '../helpers';
+import { resetTestDb, seedSettings, seedMeal, seedCatalogItems, todayStr } from '../helpers';
+
+// Two reusable catalog items with known star values
+const RED_ITEM  = { mealName: 'מנה אדומה',  amount: '1 יחידה', numberOfYellowStars: 0, numberOfRedStars: 2, free: false, category: 'כללי' };
+const YELLOW_ITEM = { mealName: 'מנה צהובה', amount: '1 יחידה', numberOfYellowStars: 1, numberOfRedStars: 0, free: false, category: 'כללי' };
 
 test.beforeEach(async () => {
   await resetTestDb();
   await seedSettings();
+  await seedCatalogItems([RED_ITEM, YELLOW_ITEM]);
 });
 
 /** Click a button that may be hidden behind the fixed bottom nav */
@@ -24,28 +29,28 @@ test.describe('Daily Meals', () => {
     await page.getByRole('button', { name: 'Add meal' }).click();
     await expect(page.getByText('Add a meal')).toBeVisible();
 
-    await page.getByText('Pizza').click();
+    await page.getByText(RED_ITEM.mealName).click();
     await jsClick(page.getByRole('button', { name: 'Add meal ✓' }));
 
     await expect(page.getByText('Add a meal')).not.toBeVisible();
-    await expect(page.getByText('🍕')).toBeVisible();
+    await expect(page.getByText(RED_ITEM.mealName)).toBeVisible();
     await expect(page.getByText(/★\s*2\s*\/\s*4/)).toBeVisible();
   });
 
   test('add multiple meals and verify score aggregation', async ({ page }) => {
     await page.goto('/');
 
-    // Add Pizza (0 yellow, 2 red)
+    // Add red meal (0 yellow, 2 red)
     await page.getByRole('button', { name: 'Add meal' }).click();
-    await page.getByText('Pizza').click();
+    await page.getByText(RED_ITEM.mealName).click();
     await jsClick(page.getByRole('button', { name: 'Add meal ✓' }));
-    await expect(page.getByText('🍕')).toBeVisible();
+    await expect(page.getByText(RED_ITEM.mealName)).toBeVisible();
 
-    // Add Egg (1 yellow, 0 red)
+    // Add yellow meal (1 yellow, 0 red)
     await page.getByRole('button', { name: 'Add meal' }).click();
-    await page.getByText('Egg').click();
+    await page.getByText(YELLOW_ITEM.mealName).click();
     await jsClick(page.getByRole('button', { name: 'Add meal ✓' }));
-    await expect(page.getByText('🥚')).toBeVisible();
+    await expect(page.getByText(YELLOW_ITEM.mealName)).toBeVisible();
 
     // Score: 1 yellow, 2 red
     await expect(page.getByText(/⭐\s*1\s*\/\s*5/)).toBeVisible();

@@ -1,4 +1,4 @@
-import { Meal, MealDefinitions } from '../types';
+import { Meal, MealDefinitions, MealType } from '../types';
 import styles from './MealList.module.css';
 
 interface Props {
@@ -20,7 +20,7 @@ export default function MealList({ meals, definitions, onDelete }: Props) {
   return (
     <ul className={styles.list}>
       {meals.map((m) => {
-        const def = definitions[m.meal];
+        const def = definitions[m.meal as MealType];
         const emoji = def?.emoji ?? '📷';
         const label = m.meal === 'analyzed' ? (m.free || 'ניתוח תמונה') : (def?.label ?? m.meal);
         return (

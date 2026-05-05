@@ -1,4 +1,4 @@
-import { Meal, MealDefinitions, MealType, Settings, WeightEntry } from '../types';
+import { Meal, MealCatalogItem, MealDefinitions, Settings, WeightEntry } from '../types';
 
 const BASE = '/api';
 
@@ -14,13 +14,24 @@ export async function fetchMealsForDate(date: string): Promise<Meal[]> {
   return res.json();
 }
 
-export async function addMeal(date: string, meal: MealType, time: string): Promise<Meal> {
+export async function addMeal(
+  date: string,
+  meal: string,
+  time: string,
+  extras?: { yellowStars: number; redStars: number; free: string; amount: string },
+): Promise<Meal> {
   const res = await fetch(`${BASE}/meals`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date, meal, time }),
+    body: JSON.stringify({ date, meal, time, ...extras }),
   });
   if (!res.ok) throw new Error('Failed to add meal');
+  return res.json();
+}
+
+export async function fetchMealCatalog(): Promise<MealCatalogItem[]> {
+  const res = await fetch(`${BASE}/meal-catalog`);
+  if (!res.ok) throw new Error('Failed to fetch meal catalog');
   return res.json();
 }
 
