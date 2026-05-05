@@ -30,7 +30,7 @@ export default function MealList({ meals, definitions, onDelete }: Props) {
             <span className={styles.name}>{label}</span>
             <span className={styles.stars}>
               {m.yellowStars > 0 && <span>{'⭐'.repeat(m.yellowStars)}</span>}
-              {m.redStars > 0 && <span>{'🔴'.repeat(m.redStars)}</span>}
+              {m.redStars > 0 && <span className={styles.redStars}>{'★'.repeat(m.redStars)}</span>}
             </span>
             <button
               className={styles.delete}

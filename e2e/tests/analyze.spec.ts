@@ -106,7 +106,7 @@ test.describe('Food Image Analysis', () => {
 
     // App navigates to Daily view after save — verify the meal appears there
     await expect(page.getByText('ארוחת צהריים')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('🔴 4')).toBeVisible();
+    await expect(page.getByText(/★\s*4\s*\/\s*4/)).toBeVisible();
   });
 
   test('edit kcal recalculates stars', async ({ page }) => {
@@ -135,7 +135,7 @@ test.describe('Food Image Analysis', () => {
     await kcalInput.fill('350');
     await kcalInput.press('Tab');
 
-    await expect(page.locator('[class*="summaryItem"]').first()).toContainText('🔴');
+    await expect(page.locator('[class*="summaryItem"]').first()).toContainText('★');
   });
 
   test('analysis failure shows error', async ({ page }) => {

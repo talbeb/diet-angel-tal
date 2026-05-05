@@ -92,7 +92,7 @@ export default function SettingsSheet({ settings, onSave, onClose }: Props) {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="max-red">
-              🔴 Max red stars / day
+              <span style={{ color: '#e53935' }}>★</span> Max red stars / day
             </label>
             <input
               id="max-red"

@@ -17,24 +17,16 @@ export default function ScoreSummary({ score, settings }: Props) {
     <div className={styles.summary}>
       <span className={styles.label}>Score</span>
 
-      {isEmpty ? (
-        <span className={styles.empty}>No meals yet</span>
-      ) : (
-        <div className={styles.scores}>
-          <span className={`${styles.pill} ${yellowOver ? styles.over : ''}`}>
-            ⭐ {yellowStars}
-            {settings?.maxYellowStars != null && (
-              <span className={styles.limit}>/ {settings.maxYellowStars}</span>
-            )}
-          </span>
-          <span className={`${styles.pill} ${redOver ? styles.over : ''}`}>
-            🔴 {redStars}
-            {settings?.maxRedStars != null && (
-              <span className={styles.limit}>/ {settings.maxRedStars}</span>
-            )}
-          </span>
-        </div>
-      )}
+      <div className={styles.scores}>
+        <span className={`${styles.pill} ${yellowOver ? styles.over : ''}`}>
+          ⭐ {yellowStars}
+          {settings?.maxYellowStars != null && ` / ${settings.maxYellowStars}`}
+        </span>
+        <span className={`${styles.pill} ${redOver ? styles.over : ''}`}>
+          <span className={styles.redStar}>★</span> {redStars}
+          {settings?.maxRedStars != null && ` / ${settings.maxRedStars}`}
+        </span>
+      </div>
 
     </div>
   );

@@ -38,6 +38,10 @@
   gap: 4px;
 }
 
+.redStars {
+  color: #e53935;
+}
+
 .delete {
   background: none;
   border: none;

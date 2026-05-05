@@ -43,6 +43,10 @@
   gap: 4px;
 }
 
+.redStars {
+  color: #e53935;
+}
+
 .noStars {
   color: #aaa;
 }

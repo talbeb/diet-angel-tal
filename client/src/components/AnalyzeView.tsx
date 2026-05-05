@@ -186,7 +186,7 @@ export default function AnalyzeView({ onMealAdded }: Props) {
                   {item.color === 'free'
                     ? <span className={styles.freeLabel}>חינמי</span>
                     : item.color === 'red'
-                      ? '🔴'.repeat(item.stars)
+                      ? <span className={styles.redStars}>{'★'.repeat(item.stars)}</span>
                       : '⭐'.repeat(item.stars)}
                 </span>
               </div>
@@ -196,7 +196,7 @@ export default function AnalyzeView({ onMealAdded }: Props) {
           {/* Summary */}
           <div className={styles.summary}>
             {totalRedStars > 0 && (
-              <span className={styles.summaryItem}>{'🔴'.repeat(Math.min(totalRedStars, MAX_STARS_DISPLAY))} {totalRedStars} כוכבים אדומים</span>
+              <span className={styles.summaryItem}><span className={styles.redStars}>{'★'.repeat(Math.min(totalRedStars, MAX_STARS_DISPLAY))}</span> {totalRedStars} כוכבים אדומים</span>
             )}
             {totalYellowStars > 0 && (
               <span className={styles.summaryItem}>{'⭐'.repeat(Math.min(totalYellowStars, MAX_STARS_DISPLAY))} {totalYellowStars} כוכבים צהובים</span>

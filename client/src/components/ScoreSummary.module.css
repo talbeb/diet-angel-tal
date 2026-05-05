@@ -51,6 +51,12 @@
   color: #e5393599;
 }
 
+.redStar {
+  color: #e53935;
+  font-size: 17px;
+  line-height: 1;
+}
+
 .empty {
   font-size: 13px;
   color: #bbb;

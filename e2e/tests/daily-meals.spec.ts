@@ -29,7 +29,7 @@ test.describe('Daily Meals', () => {
 
     await expect(page.getByText('Add a meal')).not.toBeVisible();
     await expect(page.getByText('🍕')).toBeVisible();
-    await expect(page.getByText('🔴 2')).toBeVisible();
+    await expect(page.getByText(/★\s*2\s*\/\s*4/)).toBeVisible();
   });
 
   test('add multiple meals and verify score aggregation', async ({ page }) => {
@@ -48,8 +48,8 @@ test.describe('Daily Meals', () => {
     await expect(page.getByText('🥚')).toBeVisible();
 
     // Score: 1 yellow, 2 red
-    await expect(page.getByText('⭐ 1')).toBeVisible();
-    await expect(page.getByText('🔴 2')).toBeVisible();
+    await expect(page.getByText(/⭐\s*1\s*\/\s*5/)).toBeVisible();
+    await expect(page.getByText(/★\s*2\s*\/\s*4/)).toBeVisible();
   });
 
   test('delete a meal', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('Daily Meals', () => {
     await page.goto('/');
     await expect(page.getByText('🥗')).toBeVisible();
     await expect(page.getByText('🥚')).toBeVisible();
-    await expect(page.getByText('⭐ 3')).toBeVisible();
+    await expect(page.getByText(/⭐\s*3\s*\/\s*5/)).toBeVisible();
   });
 
   test('score shows over-limit styling when exceeding max', async ({ page }) => {
@@ -100,7 +100,6 @@ test.describe('Daily Meals', () => {
     }
 
     await page.goto('/');
-    await expect(page.getByText('🔴 6')).toBeVisible();
-    await expect(page.getByText(/\/ 4/)).toBeVisible();
+    await expect(page.getByText(/★\s*6\s*\/\s*4/)).toBeVisible();
   });
 });

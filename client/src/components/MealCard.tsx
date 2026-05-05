@@ -21,7 +21,7 @@ export default function MealCard({ mealType, definition, selected, onSelect }: P
       <span className={styles.label}>{label}</span>
       <span className={styles.stars}>
         {yellowStars > 0 && <span>{'⭐'.repeat(yellowStars)}</span>}
-        {redStars > 0 && <span>{'🔴'.repeat(redStars)}</span>}
+        {redStars > 0 && <span className={styles.redStars}>{'★'.repeat(redStars)}</span>}
         {yellowStars === 0 && redStars === 0 && <span className={styles.noStars}>—</span>}
       </span>
     </button>

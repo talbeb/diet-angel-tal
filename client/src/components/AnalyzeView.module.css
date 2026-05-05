@@ -256,6 +256,10 @@
   color: #333;
 }
 
+.redStars {
+  color: #e53935;
+}
+
 /* Add section */
 .addSection {
   display: flex;
