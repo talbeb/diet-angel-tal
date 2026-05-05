@@ -1,13 +1,9 @@
 services:
   - type: web
     name: diet-angel-tal
-    runtime: node
+    runtime: docker
     plan: free
-    buildCommand: cd client && npm install && npm run build && cd ../server && npm install && npm run build
-    startCommand: cd server && node dist/index.js
     envVars:
-      - key: NODE_ENV
-        value: development
       - key: MONGO_URI
         sync: false
       - key: ANTHROPIC_API_KEY
