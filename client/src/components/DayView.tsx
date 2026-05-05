@@ -113,6 +113,15 @@ export default function DayView() {
         >
           ›
         </button>
+        {!isToday && (
+          <button
+            className={styles.todayBtn}
+            onClick={() => setDate(toDateString(new Date()))}
+            type="button"
+          >
+            Today
+          </button>
+        )}
         <button
           className={styles.settingsBtn}
           onClick={() => setSettingsOpen(true)}

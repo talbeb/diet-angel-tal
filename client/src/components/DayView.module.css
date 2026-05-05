@@ -18,6 +18,25 @@
   z-index: 5;
 }
 
+.todayBtn {
+  background: none;
+  border: 1.5px solid #4caf50;
+  color: #4caf50;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: 12px;
+  line-height: 1.4;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.todayBtn:hover {
+  background: #4caf50;
+  color: #fff;
+}
+
 .settingsBtn {
   background: none;
   border: none;
