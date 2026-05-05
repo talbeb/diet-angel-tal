@@ -10,6 +10,7 @@ import weightRouter from './routes/weight';
 import analyzeRouter from './routes/analyze';
 import calendarRouter from './routes/calendar';
 import trainingRouter from './routes/training';
+import mealCatalogRouter from './routes/mealCatalog';
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use('/api', weightRouter);
 app.use('/api', analyzeRouter);
 if (ENABLE_CALENDAR) app.use('/api', calendarRouter);
 app.use('/api', trainingRouter);
+app.use('/api', mealCatalogRouter);
 
 // In production, serve the built client
 const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
