@@ -1,11 +1,24 @@
 const API_BASE = 'http://localhost:3002/api';
 
+/** Fetch with retry — guards against server cold-start delays */
+async function apiFetch(url: string, options?: RequestInit, retries = 3): Promise<Response> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok) return res;
+    } catch {
+      // connection refused — server not ready yet
+    }
+    if (i < retries - 1) await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`API call failed after ${retries} retries: ${options?.method ?? 'GET'} ${url}`);
+}
+
 /**
- * Clears the test database by calling API endpoints to delete all data.
- * Uses a dedicated test-reset endpoint if available, otherwise deletes via API.
+ * Clears the test database by calling the test-reset endpoint.
  */
 export async function resetTestDb() {
-  await fetch(`${API_BASE}/test/reset`, { method: 'POST' });
+  await apiFetch(`${API_BASE}/test/reset`, { method: 'POST' });
 }
 
 /**
@@ -23,7 +36,7 @@ export async function seedSettings(overrides: Record<string, unknown> = {}) {
     sessionDurationMin: 60,
     ...overrides,
   };
-  await fetch(`${API_BASE}/settings`, {
+  await apiFetch(`${API_BASE}/settings`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings),
@@ -40,7 +53,7 @@ export async function seedMeal(meal: {
   yellowStars?: number;
   redStars?: number;
 }) {
-  await fetch(`${API_BASE}/meals`, {
+  await apiFetch(`${API_BASE}/meals`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(meal),
@@ -51,7 +64,7 @@ export async function seedMeal(meal: {
  * Seeds a weight entry via API.
  */
 export async function seedWeight(entry: { date: string; weight: number }) {
-  await fetch(`${API_BASE}/weight`, {
+  await apiFetch(`${API_BASE}/weight`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry),
@@ -67,7 +80,7 @@ export async function seedTraining(training: {
   endTime: string;
   durationMin: number;
 }) {
-  await fetch(`${API_BASE}/training`, {
+  await apiFetch(`${API_BASE}/training`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(training),
